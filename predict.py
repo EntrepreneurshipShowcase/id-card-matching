@@ -9,7 +9,7 @@ class Predictor:
     def __init__(self):
         self.model = get_siamese_model(training=False)
         self.model.load_weights(
-            "D:\\Facial Recognition\\logs\\training\\siamese.h5", by_name=True
+            "./siamese.h5", by_name=True
         )
         self.threshold = 95
 
