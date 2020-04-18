@@ -1,5 +1,4 @@
 import tensorflow as tf
-import joblib
 import os
 
 from model import get_siamese_model

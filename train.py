@@ -3,12 +3,13 @@ import datetime
 import numpy as np
 import tensorflow as tf
 
-from model import get_siamese_model
+# from model import get_siamese_model
+from model_large import get_siamese_model
 from losses import triplet_loss
 from metrics import triplet_accuracy
 
 NUM_EPOCHS = 1000
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 TRAIN_STEPS = 500
 VAL_STEPS = 100
 LEARNING_RATE = 0.0001
@@ -203,7 +204,7 @@ else:
 # model.load_weights(".\\logs\\20200124-154942\\siamese.h5")
 
 if __name__ == "__main__":
-    log_dir = "logs\\" + "training"
+    log_dir = "logs\\" + "training_large_margin"
     tensorboard_callback = tf.keras.callbacks.TensorBoard(
         log_dir=log_dir, histogram_freq=1, profile_batch="100,400"
     )
