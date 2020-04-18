@@ -9,9 +9,6 @@ cap = cv2.VideoCapture(0)
 cap.set(3, 640)  # set Width
 cap.set(4, 640)  # set Height
 driver = id_database.DataDriver()
-driver.add_person("rohil", 1111, cv2.imread("./ids/test_rohil.jpg"))
-driver.add_person("sai", 2222, cv2.imread("./ids/test_sai.jpg"))
-driver.add_person("ayush", 3333, cv2.imread("./ids/test_ayush.jpg"))
 
 
 while True:

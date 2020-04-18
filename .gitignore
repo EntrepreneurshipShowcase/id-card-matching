@@ -9,4 +9,4 @@ Data.zip
 *.tfrecords
 *.png
 *.jpg
-*.json
+# *.json
