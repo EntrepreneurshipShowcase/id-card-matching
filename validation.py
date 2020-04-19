@@ -3,7 +3,7 @@ import datetime
 import numpy as np
 import tensorflow as tf
 
-from model import get_siamese_model
+from model_large import get_siamese_model
 from losses import triplet_loss
 from metrics import triplet_accuracy
 
@@ -36,47 +36,76 @@ val_dataset = val_dataset.map(
     lambda x: (x["anchor"], x["positive"], x["negative"]),
     num_parallel_calls=tf.data.experimental.AUTOTUNE,
 )
+import ipdb; ipdb.set_trace()
 
 
+# def _process_image(anchor, positive, negative):
+#     anchor_img = tf.reshape(
+#         tf.image.resize(
+#             tf.reshape(
+#                 tf.keras.applications.inception_resnet_v2.preprocess_input(
+#                     tf.io.decode_image(anchor, dtype=tf.float32)
+#                 ),
+#                 (250, 250, 3),
+#             ),
+#             (224, 224),
+#         ),
+#         (224, 224, 3),
+#     )
+#     positive_img = tf.reshape(
+#         tf.image.resize(
+#             tf.reshape(
+#                 tf.keras.applications.inception_resnet_v2.preprocess_input(
+#                     tf.io.decode_image(positive, dtype=tf.float32)
+#                 ),
+#                 (250, 250, 3),
+#             ),
+#             (224, 224),
+#         ),
+#         (224, 224, 3),
+#     )
+#     negative_img = tf.reshape(
+#         tf.image.resize(
+#             tf.reshape(
+#                 tf.keras.applications.inception_resnet_v2.preprocess_input(
+#                     tf.io.decode_image(negative, dtype=tf.float32)
+#                 ),
+#                 (250, 250, 3),
+#             ),
+#             (224, 224),
+#         ),
+#         (224, 224, 3),
+#     )
+#     return anchor_img, positive_img, negative_img
 def _process_image(anchor, positive, negative):
-    anchor_img = tf.reshape(
+    anchor_img = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
         tf.image.resize(
             tf.reshape(
-                tf.keras.applications.inception_resnet_v2.preprocess_input(
-                    tf.io.decode_image(anchor, dtype=tf.float32)
-                ),
-                (250, 250, 3),
+                    tf.io.decode_image(anchor, dtype=tf.float32), (64, 64, 3),
             ),
-            (224, 224),
+            (96, 96),
         ),
-        (224, 224, 3),
-    )
-    positive_img = tf.reshape(
+        (96, 96, 3),
+    ))
+    positive_img = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
         tf.image.resize(
             tf.reshape(
-                tf.keras.applications.inception_resnet_v2.preprocess_input(
-                    tf.io.decode_image(positive, dtype=tf.float32)
-                ),
-                (250, 250, 3),
+                    tf.io.decode_image(positive, dtype=tf.float32), (64, 64, 3),
             ),
-            (224, 224),
+            (96, 96),
         ),
-        (224, 224, 3),
-    )
-    negative_img = tf.reshape(
+        (96, 96, 3),
+    ))
+    negative_img = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
         tf.image.resize(
             tf.reshape(
-                tf.keras.applications.inception_resnet_v2.preprocess_input(
-                    tf.io.decode_image(negative, dtype=tf.float32)
-                ),
-                (250, 250, 3),
+                    tf.io.decode_image(negative, dtype=tf.float32), (64, 64, 3),
             ),
-            (224, 224),
+            (96, 96),
         ),
-        (224, 224, 3),
-    )
+        (96, 96, 3),
+    ))
     return anchor_img, positive_img, negative_img
-
 
 val_dataset = val_dataset.map(
     _process_image, num_parallel_calls=tf.data.experimental.AUTOTUNE
@@ -121,8 +150,7 @@ else:
     )
     model.compile(optimizer)
 
-model.load_weights(".\\logs\\training\\siamese.h5")
+model.load_weights(".\\logs\\training_large_margin\\siamese.h5")
 
 if __name__ == "__main__":
-
     model.evaluate(val_dataset, steps=200)

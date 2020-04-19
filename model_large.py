@@ -156,7 +156,7 @@ def get_siamese_model(training=True):
         base_n = base_embedding(base_n)
 
         base_a, base_p, base_n = TripletLoss(margin=4)(base_a, base_p, base_n)
-        # base_a, base_p, base_n = TripletAccuracy(margin=55)(base_a, base_p, base_n)
+        base_a, base_p, base_n = TripletAccuracy(margin=55)(base_a, base_p, base_n)
         # TripletLoss(margin=4)(base_a, base_p, base_n)
 
         shifted1_a = shift1_embedding(shifted1_a)
@@ -171,9 +171,9 @@ def get_siamese_model(training=True):
         shifted1_a, shifted1_p, shifted1_n = TripletLoss(margin=10)(
             shifted1_a, shifted1_p, shifted1_n
         )
-        # shifted1_a, shifted1_p, shifted1_n = TripletAccuracy(margin=90)(
-        #     shifted1_a, shifted1_p, shifted1_n
-        # )
+        shifted1_a, shifted1_p, shifted1_n = TripletAccuracy(margin=10)(
+            shifted1_a, shifted1_p, shifted1_n
+        )
         # TripletLoss(margin=7)(shifted1_a, shifted1_p, shifted1_n)
 
         shifted2_a = shift2_embedding(shifted2_a)
@@ -187,9 +187,9 @@ def get_siamese_model(training=True):
         shifted2_a, shifted2_p, shifted2_n = TripletLoss(margin=15)(
             shifted2_a, shifted2_p, shifted2_n
         )
-        # shifted2_a, shifted2_p, shifted2_n = TripletAccuracy(margin=95)(
-        #     shifted2_a, shifted2_p, shifted2_n
-        # )
+        shifted2_a, shifted2_p, shifted2_n = TripletAccuracy(margin=15)(
+            shifted2_a, shifted2_p, shifted2_n
+        )
 
         shifted3_a = shift3_embedding(shifted3_a)
         shifted3_a = layers.Add()([shifted3_a, shifted2_a])
@@ -203,9 +203,9 @@ def get_siamese_model(training=True):
         shifted3_a, shifted3_p, shifted3_n = TripletLoss(margin=25)(
             shifted3_a, shifted3_p, shifted3_n
         )
-        # shifted3_a, shifted3_p, shifted3_n = TripletAccuracy(margin=95)(
-        #     shifted3_a, shifted3_p, shifted3_n
-        # )
+        shifted3_a, shifted3_p, shifted3_n = TripletAccuracy(margin=25)(
+            shifted3_a, shifted3_p, shifted3_n
+        )
         shifted4_a = shift4_embedding(shifted4_a)
         shifted4_a = layers.Add()([shifted4_a, shifted4_a])
 
@@ -218,9 +218,9 @@ def get_siamese_model(training=True):
         shifted4_a, shifted4_p, shifted4_n = TripletLoss(margin=40)(
             shifted4_a, shifted4_p, shifted4_n
         )
-        # shifted4_a, shifted4_p, shifted4_n = TripletAccuracy(margin=95)(
-        #     shifted4_a, shifted4_p, shifted4_n
-        # )
+        shifted4_a, shifted4_p, shifted4_n = TripletAccuracy(margin=200)(
+            shifted4_a, shifted4_p, shifted4_n
+        )
         # TripletLoss(margin=10)(shifted2_a, shifted2_p, shifted2_n)
 
         shifted4 = layers.Concatenate()([shifted4_a, shifted4_p, shifted4_n])

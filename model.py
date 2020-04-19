@@ -5,7 +5,7 @@ from losses import triplet_loss
 from metrics import triplet_accuracy
 from tensorflow.keras.applications import mobilenet_v2
 
-EMBEDDING_LAYER_DIM = 1024
+EMBEDDING_LAYER_DIM = 256
 
 
 class BaseEmbedding(layers.Layer):
@@ -25,7 +25,7 @@ class Shift1Embedding(layers.Layer):
     def __init__(self):
         super(Shift1Embedding, self).__init__()
         self.global_pool = layers.GlobalMaxPool2D()
-        self.conv1 = layers.Conv2D(1024, (3, 3))
+        self.conv1 = layers.Conv2D(512, (3, 3))
         self.bn = layers.BatchNormalization()
         self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
 
@@ -43,7 +43,7 @@ class Shift2Embedding(layers.Layer):
     def __init__(self):
         super(Shift2Embedding, self).__init__()
         self.global_pool = layers.GlobalMaxPool2D()
-        self.conv1 = layers.Conv2D(512, (3, 3), (2, 2))
+        self.conv1 = layers.Conv2D(256, (3, 3), (2, 2))
         self.bn = layers.BatchNormalization()
         self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
 
@@ -88,8 +88,8 @@ class TripletAccuracy(layers.Layer):
 
 
 def get_siamese_model(training=True):
-    inp_shape = (224, 224, 3)
-    base_model = mobilenet_v2.MobileNetV2(include_top=False, input_shape=(224, 224, 3))
+    inp_shape = (96, 96, 3)
+    base_model = mobilenet_v2.MobileNetV2(include_top=False, input_shape=(96, 96, 3))
 
     if training:
         input_a = layers.Input(inp_shape, name="anchor")
@@ -100,8 +100,8 @@ def get_siamese_model(training=True):
             inputs=base_model.input,
             outputs=(
                 base_model.output,
+                base_model.get_layer("block_14_add").output,
                 base_model.get_layer("block_11_add").output,
-                base_model.get_layer("block_7_add").output,
             ),
         )
         # base = tf.keras.Model(inputs=base_model.input, outputs=(base_model.output, base_model.get_layer("conv4_block6_out").output, base_model.get_layer("conv3_block4_out").output))
@@ -169,8 +169,8 @@ def get_siamese_model(training=True):
             inputs=base_model.input,
             outputs=(
                 base_model.output,
+                base_model.get_layer("block_14_add").output,
                 base_model.get_layer("block_11_add").output,
-                base_model.get_layer("block_7_add").output,
             ),
         )
 

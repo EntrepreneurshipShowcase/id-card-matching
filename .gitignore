@@ -10,3 +10,7 @@ Data.zip
 *.png
 *.jpg
 # *.json
+*.ppm
+*.zip
+faces_uncropped/**
+*.txt

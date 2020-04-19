@@ -2,13 +2,15 @@
 
 ## Instructions: 
 
+### In repo folder:
+
 1. Install Virtualenv if not done so already using:
 
     `pip install --user virtualenv`
 
 2. Create virtual environment using:
 
-    `virtualenv env --python=python3`
+    `python -m venv env`
 
 3. Activate virtual environment using:
 
