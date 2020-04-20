@@ -14,8 +14,8 @@ driver = id_database.DataDriver()
 while True:
     ret, frame = cap.read()
     frame = cv2.flip(frame, 1)  # Flip camera vertically
-
-    name, id = driver.lookup_person(frame)
+    print(frame.shape)
+    id, name = driver.lookup_person(frame)
     cv2.imshow("web cam", frame)
     print(name)
     k = cv2.waitKey(30) & 0xFF

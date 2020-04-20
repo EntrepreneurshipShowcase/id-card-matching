@@ -1,7 +1,7 @@
 Data/**
 env/**
 env_1/**
-lfw/**
+lfw*/**
 .vscode/**
 __pycache__/**
 logs/**
@@ -10,3 +10,4 @@ Data.zip
 *.png
 *.jpg
 # *.json
+*.zip
