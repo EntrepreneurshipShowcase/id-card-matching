@@ -15,10 +15,14 @@ class IDDatabase:
         self.db = firestore.client()
         self.predictor = predictor
         self.doc = self.db.collection(u"base").document(u"dhs")
-    def add_person(self, name, id, image):
+    def add_person(self, name, id, image, rfid=None):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        if rfid:
+            id_num = rfid
+        else:
+            id_num = id
         data = {
-            str(id): {
+            str(id_num): {
                 u"name": name,
                 u"id": id,
                 u"vector": self.predictor.get_vec(image).tolist()[0],

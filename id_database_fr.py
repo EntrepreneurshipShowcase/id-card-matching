@@ -12,10 +12,14 @@ class IDDatabase:
         firebase_admin.initialize_app(self.cred)
         self.db = firestore.client()
         self.doc = self.db.collection(u"base").document(u"dhs")
-    def add_person(self, name, id, image):
+    def add_person(self, name, id, image, rfid=None):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        if rfid:
+            id_num = rfid
+        else:
+            id_num = id
         data = {
-            str(id): {
+            str(id_num): {
                 u"name": name,
                 u"id": id,
                 u"vector": face_recognition.face_encodings(image)[0].tolist(),
@@ -31,9 +35,9 @@ class IDDatabase:
 class DataDriver:
     def __init__(self):
         self.database = IDDatabase()
-        self.threshold = 95
+        self.threshold = 0.6
         self.database.doc.on_snapshot(self.on_update)
-
+        self.id_vectors = self.database.get_ids().to_dict()
     def on_update(self, doc_snapshot, changes, read_time):
         for doc in doc_snapshot:
             self.id_vectors = doc.to_dict()
