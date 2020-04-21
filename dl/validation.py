@@ -3,28 +3,18 @@ import datetime
 import numpy as np
 import tensorflow as tf
 
-# from model import get_siamese_model
-from model import get_siamese_model
-from losses import triplet_loss
-from metrics import triplet_accuracy
+from dl.model_large import get_siamese_model
+from dl.losses import triplet_loss
+from dl.metrics import triplet_accuracy
 
-NUM_EPOCHS = 1000
-BATCH_SIZE = 64
-TRAIN_STEPS = 500
-VAL_STEPS = 100
-LEARNING_RATE = 0.0001
-MIXED_PRECISION = False
-DATA_DIR = "./lfw/lfw/"  # "./Data/"
-NUM_FOLDERS = 1680  # 10575
+BATCH_SIZE = 32
 DISTRIBUTE = False
+LEARNING_RATE = 0.0001
 
 import logging
 
 logging.getLogger("tensorflow").disabled = True
 
-if MIXED_PRECISION:
-    policy = tf.keras.mixed_precision.experimental.Policy("mixed_float16")
-    tf.keras.mixed_precision.experimental.set_policy(policy)
 
 image_feature_description = {
     "anchor": tf.io.FixedLenFeature([], tf.string),
@@ -38,16 +28,55 @@ def _parse_image_function(example_proto):
     return tf.io.parse_single_example(example_proto, image_feature_description)
 
 
-dataset = tf.data.TFRecordDataset("./triplet_data.tfrecords")
-dataset = dataset.map(
+val_dataset = tf.data.TFRecordDataset("./triplet_data_test.tfrecords")
+val_dataset = val_dataset.map(
     _parse_image_function, num_parallel_calls=tf.data.experimental.AUTOTUNE
 )
-dataset = dataset.map(
+val_dataset = val_dataset.map(
     lambda x: (x["anchor"], x["positive"], x["negative"]),
     num_parallel_calls=tf.data.experimental.AUTOTUNE,
 )
+import ipdb; ipdb.set_trace()
 
 
+# def _process_image(anchor, positive, negative):
+#     anchor_img = tf.reshape(
+#         tf.image.resize(
+#             tf.reshape(
+#                 tf.keras.applications.inception_resnet_v2.preprocess_input(
+#                     tf.io.decode_image(anchor, dtype=tf.float32)
+#                 ),
+#                 (250, 250, 3),
+#             ),
+#             (224, 224),
+#         ),
+#         (224, 224, 3),
+#     )
+#     positive_img = tf.reshape(
+#         tf.image.resize(
+#             tf.reshape(
+#                 tf.keras.applications.inception_resnet_v2.preprocess_input(
+#                     tf.io.decode_image(positive, dtype=tf.float32)
+#                 ),
+#                 (250, 250, 3),
+#             ),
+#             (224, 224),
+#         ),
+#         (224, 224, 3),
+#     )
+#     negative_img = tf.reshape(
+#         tf.image.resize(
+#             tf.reshape(
+#                 tf.keras.applications.inception_resnet_v2.preprocess_input(
+#                     tf.io.decode_image(negative, dtype=tf.float32)
+#                 ),
+#                 (250, 250, 3),
+#             ),
+#             (224, 224),
+#         ),
+#         (224, 224, 3),
+#     )
+#     return anchor_img, positive_img, negative_img
 def _process_image(anchor, positive, negative):
     anchor_img = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
         tf.image.resize(
@@ -78,36 +107,6 @@ def _process_image(anchor, positive, negative):
     ))
     return anchor_img, positive_img, negative_img
 
-
-dataset = dataset.map(_process_image, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-
-anchors = dataset.map(
-    lambda x, y, z: x, num_parallel_calls=tf.data.experimental.AUTOTUNE
-).batch(BATCH_SIZE)
-positives = dataset.map(
-    lambda x, y, z: y, num_parallel_calls=tf.data.experimental.AUTOTUNE
-).batch(BATCH_SIZE)
-negatives = dataset.map(
-    lambda x, y, z: z, num_parallel_calls=tf.data.experimental.AUTOTUNE
-).batch(BATCH_SIZE)
-
-dataset = tf.data.Dataset.zip((anchors, positives, negatives))
-train_dataset = dataset.map(
-    lambda x, y, z: ((x, y, z), np.empty(0)),
-    num_parallel_calls=tf.data.experimental.AUTOTUNE,
-).repeat()
-
-
-
-val_dataset = tf.data.TFRecordDataset("./triplet_data_test.tfrecords")
-val_dataset = val_dataset.map(
-    _parse_image_function, num_parallel_calls=tf.data.experimental.AUTOTUNE
-)
-val_dataset = val_dataset.map(
-    lambda x: (x["anchor"], x["positive"], x["negative"]),
-    num_parallel_calls=tf.data.experimental.AUTOTUNE,
-)
-
 val_dataset = val_dataset.map(
     _process_image, num_parallel_calls=tf.data.experimental.AUTOTUNE
 )
@@ -127,8 +126,6 @@ val_dataset = val_dataset.map(
     lambda x, y, z: ((x, y, z), np.empty(0)),
     num_parallel_calls=tf.data.experimental.AUTOTUNE,
 ).repeat()
-
-train_dataset = train_dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
 
 def scheduler(epoch):
@@ -153,25 +150,7 @@ else:
     )
     model.compile(optimizer)
 
-# model.load_weights(".\\logs\\training_large_margin\\siamese.h5")
+model.load_weights(".\\logs\\training_large_margin\\siamese.h5")
 
 if __name__ == "__main__":
-    log_dir = "logs\\" + "cropped"
-    tensorboard_callback = tf.keras.callbacks.TensorBoard(
-        log_dir=log_dir, histogram_freq=1, profile_batch="100,400"
-    )
-    checkpoint = tf.keras.callbacks.ModelCheckpoint(log_dir + "\\siamese.h5", verbose=1)
-    lr_callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
-
-    # train_gen = get_triplet_data(BATCH_SIZE)
-    # val_gen = get_triplet_data(BATCH_SIZE)
-    model.fit(
-        train_dataset,
-        validation_data=val_dataset,
-        steps_per_epoch=TRAIN_STEPS,
-        validation_steps=VAL_STEPS,
-        epochs=NUM_EPOCHS,
-        callbacks=[checkpoint],
-        workers=1,
-        use_multiprocessing=False,
-    )
+    model.evaluate(val_dataset, steps=200)

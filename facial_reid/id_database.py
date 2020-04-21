@@ -6,7 +6,7 @@ from firebase_admin import firestore
 import cv2
 import functools
 
-import predict
+import dl.predict
 
 class IDDatabase:
     def __init__(self, predictor):

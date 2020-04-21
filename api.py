@@ -1,4 +1,4 @@
-import id_database_fr as db
+import facial_reid.id_database_fr as db
 
 import cv2
 import numpy as np
