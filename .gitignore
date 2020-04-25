@@ -11,3 +11,5 @@ Data.zip
 *.jpg
 # *.json
 *.zip
+logs
+*.h5

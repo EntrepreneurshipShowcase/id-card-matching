@@ -13,4 +13,4 @@ def triplet_accuracy(a_pred, p_pred, n_pred, alpha, batch_size=32):
     total_correct = 0
     total_correct += tf.reduce_sum(tf.cast(positive_distance < alpha, tf.float32))
     total_correct -= tf.reduce_sum(tf.cast(negative_distance > alpha, tf.float32))
-    return total_correct
+    return negative_distance - positive_distance

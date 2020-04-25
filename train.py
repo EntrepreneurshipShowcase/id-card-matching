@@ -4,15 +4,15 @@ import numpy as np
 import tensorflow as tf
 
 # from model import get_siamese_model
-from model_large import get_siamese_model
+from fpn_model import get_siamese_model
 from losses import triplet_loss
 from metrics import triplet_accuracy
 
-NUM_EPOCHS = 1000
-BATCH_SIZE = 32
+NUM_EPOCHS = 200
+BATCH_SIZE = 8
 TRAIN_STEPS = 500
 VAL_STEPS = 100
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.0005
 MIXED_PRECISION = False
 DATA_DIR = "./lfw/lfw/"  # "./Data/"
 NUM_FOLDERS = 1680  # 10575
@@ -52,7 +52,7 @@ def _process_image(anchor, positive, negative):
     anchor_img = tf.reshape(
         tf.image.resize(
             tf.reshape(
-                tf.keras.applications.inception_resnet_v2.preprocess_input(
+                tf.keras.applications.resnet_v2.preprocess_input(
                     tf.io.decode_image(anchor, dtype=tf.float32)
                 ),
                 (250, 250, 3),
@@ -64,7 +64,7 @@ def _process_image(anchor, positive, negative):
     positive_img = tf.reshape(
         tf.image.resize(
             tf.reshape(
-                tf.keras.applications.inception_resnet_v2.preprocess_input(
+                tf.keras.applications.resnet_v2.preprocess_input(
                     tf.io.decode_image(positive, dtype=tf.float32)
                 ),
                 (250, 250, 3),
@@ -76,7 +76,7 @@ def _process_image(anchor, positive, negative):
     negative_img = tf.reshape(
         tf.image.resize(
             tf.reshape(
-                tf.keras.applications.inception_resnet_v2.preprocess_input(
+                tf.keras.applications.resnet_v2.preprocess_input(
                     tf.io.decode_image(negative, dtype=tf.float32)
                 ),
                 (250, 250, 3),
@@ -115,45 +115,6 @@ val_dataset = val_dataset.map(
     num_parallel_calls=tf.data.experimental.AUTOTUNE,
 )
 
-
-def _process_image(anchor, positive, negative):
-    anchor_img = tf.reshape(
-        tf.image.resize(
-            tf.reshape(
-                tf.keras.applications.inception_resnet_v2.preprocess_input(
-                    tf.io.decode_image(anchor, dtype=tf.float32)
-                ),
-                (250, 250, 3),
-            ),
-            (224, 224),
-        ),
-        (224, 224, 3),
-    )
-    positive_img = tf.reshape(
-        tf.image.resize(
-            tf.reshape(
-                tf.keras.applications.inception_resnet_v2.preprocess_input(
-                    tf.io.decode_image(positive, dtype=tf.float32)
-                ),
-                (250, 250, 3),
-            ),
-            (224, 224),
-        ),
-        (224, 224, 3),
-    )
-    negative_img = tf.reshape(
-        tf.image.resize(
-            tf.reshape(
-                tf.keras.applications.inception_resnet_v2.preprocess_input(
-                    tf.io.decode_image(negative, dtype=tf.float32)
-                ),
-                (250, 250, 3),
-            ),
-            (224, 224),
-        ),
-        (224, 224, 3),
-    )
-    return anchor_img, positive_img, negative_img
 
 
 val_dataset = val_dataset.map(
@@ -204,12 +165,11 @@ else:
 # model.load_weights(".\\logs\\20200124-154942\\siamese.h5")
 
 if __name__ == "__main__":
-    log_dir = "logs\\" + "training_large_margin"
+    log_dir = "logs\\" + "training_resnet"
     tensorboard_callback = tf.keras.callbacks.TensorBoard(
-        log_dir=log_dir, histogram_freq=1, profile_batch="100,400"
+        log_dir=log_dir, histogram_freq=1
     )
     checkpoint = tf.keras.callbacks.ModelCheckpoint(log_dir + "\\siamese.h5", verbose=1)
-    lr_callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
 
     # train_gen = get_triplet_data(BATCH_SIZE)
     # val_gen = get_triplet_data(BATCH_SIZE)

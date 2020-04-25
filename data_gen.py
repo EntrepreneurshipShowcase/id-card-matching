@@ -4,12 +4,12 @@ import os
 from tqdm import tqdm
 
 NUM_EPOCHS = 400
-BATCH_SIZE = 8
+BATCH_SIZE = 16
 TRAIN_STEPS = 500
 VAL_STEPS = 100
 LEARNING_RATE = 0.0001
 MIXED_PRECISION = False
-DATA_DIR = "./lfw/lfw/"  # "./Data/"
+DATA_DIR = "./data/lfw/"  # "./Data/"
 NUM_FOLDERS = 1680  # 10575
 DISTRIBUTE = False
 

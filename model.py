@@ -3,16 +3,16 @@ import numpy as np
 import tensorflow.keras.layers as layers
 from losses import triplet_loss
 from metrics import triplet_accuracy
-from tensorflow.keras.applications import mobilenet_v2
+from tensorflow.keras.applications import resnet_v2
 
-EMBEDDING_LAYER_DIM = 1024
+EMBEDDING_LAYER_DIM = 256
 
 
 class BaseEmbedding(layers.Layer):
     def __init__(self):
         super(BaseEmbedding, self).__init__()
         self.global_pool = layers.GlobalMaxPool2D()
-        self.conv1 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
+        self.conv1 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1), activation="relu")
 
     def call(self, inputs):
         x = self.conv1(inputs)
@@ -25,9 +25,9 @@ class Shift1Embedding(layers.Layer):
     def __init__(self):
         super(Shift1Embedding, self).__init__()
         self.global_pool = layers.GlobalMaxPool2D()
-        self.conv1 = layers.Conv2D(1024, (3, 3))
+        self.conv1 = layers.Conv2D(512, (3, 3), activation="relu")
         self.bn = layers.BatchNormalization()
-        self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
+        self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1), activation="relu")
 
     def call(self, inputs):
         x = self.conv1(inputs)
@@ -43,9 +43,9 @@ class Shift2Embedding(layers.Layer):
     def __init__(self):
         super(Shift2Embedding, self).__init__()
         self.global_pool = layers.GlobalMaxPool2D()
-        self.conv1 = layers.Conv2D(512, (3, 3), (2, 2))
+        self.conv1 = layers.Conv2D(256, (3, 3), (2, 2), activation="relu")
         self.bn = layers.BatchNormalization()
-        self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
+        self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1), activation="relu")
 
     def call(self, inputs):
         x = self.conv1(inputs)
@@ -88,23 +88,24 @@ class TripletAccuracy(layers.Layer):
 
 
 def get_siamese_model(training=True):
-    inp_shape = (224, 224, 3)
-    base_model = mobilenet_v2.MobileNetV2(include_top=False, input_shape=(224, 224, 3))
+    inp_shape = (299, 299, 3)
+    base_model = resnet_v2.ResNet50V2(include_top=False, weights="imagenet")
+    base_model.trainable=False
 
     if training:
         input_a = layers.Input(inp_shape, name="anchor")
         input_p = layers.Input(inp_shape, name="positive")
         input_n = layers.Input(inp_shape, name="negative")
 
-        base = tf.keras.Model(
-            inputs=base_model.input,
-            outputs=(
-                base_model.output,
-                base_model.get_layer("block_11_add").output,
-                base_model.get_layer("block_7_add").output,
-            ),
-        )
-        # base = tf.keras.Model(inputs=base_model.input, outputs=(base_model.output, base_model.get_layer("conv4_block6_out").output, base_model.get_layer("conv3_block4_out").output))
+        # base = tf.keras.Model(
+        #     inputs=base_model.input,
+        #     outputs=(
+        #         base_model.output,
+        #         base_model.get_layer("block_11_add").output,
+        #         base_model.get_layer("block_7_add").output,
+        #     ),
+        # )
+        base = tf.keras.Model(inputs=base_model.input, outputs=(base_model.output, base_model.get_layer("conv4_block6_out").output, base_model.get_layer("conv3_block4_out").output))
 
         base_embedding = BaseEmbedding()
         shift1_embedding = Shift1Embedding()
@@ -119,7 +120,7 @@ def get_siamese_model(training=True):
         base_n = base_embedding(base_n)
 
         base_a, base_p, base_n = TripletLoss(margin=4)(base_a, base_p, base_n)
-        base_a, base_p, base_n = TripletAccuracy(margin=55)(base_a, base_p, base_n)
+        # base_a, base_p, base_n = TripletAccuracy(margin=55)(base_a, base_p, base_n)
         # TripletLoss(margin=4)(base_a, base_p, base_n)
 
         shifted1_a = shift1_embedding(shifted1_a)
@@ -134,9 +135,9 @@ def get_siamese_model(training=True):
         shifted1_a, shifted1_p, shifted1_n = TripletLoss(margin=7)(
             shifted1_a, shifted1_p, shifted1_n
         )
-        shifted1_a, shifted1_p, shifted1_n = TripletAccuracy(margin=90)(
-            shifted1_a, shifted1_p, shifted1_n
-        )
+        # shifted1_a, shifted1_p, shifted1_n = TripletAccuracy(margin=10)(
+        #     shifted1_a, shifted1_p, shifted1_n
+        # )
         # TripletLoss(margin=7)(shifted1_a, shifted1_p, shifted1_n)
 
         shifted2_a = shift2_embedding(shifted2_a)
@@ -151,9 +152,9 @@ def get_siamese_model(training=True):
         shifted2_a, shifted2_p, shifted2_n = TripletLoss(margin=10)(
             shifted2_a, shifted2_p, shifted2_n
         )
-        shifted2_a, shifted2_p, shifted2_n = TripletAccuracy(margin=95)(
-            shifted2_a, shifted2_p, shifted2_n
-        )
+        # shifted2_a, shifted2_p, shifted2_n = TripletAccuracy(margin=10)(
+        #     shifted2_a, shifted2_p, shifted2_n
+        # )
         # TripletLoss(margin=10)(shifted2_a, shifted2_p, shifted2_n)
 
         shifted2 = layers.Concatenate()([shifted2_a, shifted2_p, shifted2_n])
@@ -164,15 +165,15 @@ def get_siamese_model(training=True):
     else:
         input_x = layers.Input(inp_shape, name="input")
 
-        # base = tf.keras.models.Model(base_model.input, (base_model.output, base_model.get_layer("conv4_block6_out").output, base_model.get_layer("conv3_block4_out").output))
-        base = tf.keras.Model(
-            inputs=base_model.input,
-            outputs=(
-                base_model.output,
-                base_model.get_layer("block_11_add").output,
-                base_model.get_layer("block_7_add").output,
-            ),
-        )
+        base = tf.keras.models.Model(base_model.input, (base_model.output, base_model.get_layer("conv4_block6_out").output, base_model.get_layer("conv3_block4_out").output))
+        # base = tf.keras.Model(
+        #     inputs=base_model.input,
+        #     outputs=(
+        #         base_model.output,
+        #         base_model.get_layer("block_11_add").output,
+        #         base_model.get_layer("block_7_add").output,
+        #     ),
+        # )
 
         base_embedding = BaseEmbedding()
         shift1_embedding = Shift1Embedding()
