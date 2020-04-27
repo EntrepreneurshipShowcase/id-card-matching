@@ -36,7 +36,7 @@ class IDDatabase:
 
 class DataDriver:
     def __init__(self):
-        self.predictor = predict.Predictor()
+        self.predictor = dl.predict.Predictor()
         self.database = IDDatabase(self.predictor)
         # Immediately get all ids
         self.database.doc.on_snapshot(self.on_update)

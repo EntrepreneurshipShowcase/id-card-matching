@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 import facial_reid.id_database_fr as db
-import face_crop
+import facial_reid.face_crop as face_crop
 
 cap = cv2.VideoCapture(0)
 cap.set(3, 640)  # set Width
