@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 
 # from model import get_siamese_model
-from dl.model import get_siamese_model
+from dl.fpn_model import get_siamese_model
 from dl.losses import triplet_loss
 from dl.metrics import triplet_accuracy
 

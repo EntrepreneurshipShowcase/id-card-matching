@@ -1,8 +1,9 @@
 import tensorflow as tf
 import numpy as np
 import tensorflow.keras.layers as layers
-from losses import triplet_loss
-from metrics import triplet_accuracy
+
+from dl.losses import triplet_loss
+from dl.metrics import triplet_accuracy
 from tensorflow.keras.applications import resnet
 
 import fpn

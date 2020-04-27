@@ -2,7 +2,7 @@ import tensorflow as tf
 import os
 import cv2
 
-from model import get_siamese_model
+from dl.model import get_siamese_model
 
 
 class Predictor:
