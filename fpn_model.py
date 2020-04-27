@@ -119,6 +119,11 @@ def get_siamese_model(training=True):
         p4_a, p4_p, p4_n = TripletLoss(margin=10)(p4_a, p4_p, p4_n)
         p5_a, p5_p, p5_n = TripletLoss(margin=13)(p5_a, p5_p, p5_n)
         p6_a, p6_p, p6_n = TripletLoss(margin=16)(p6_a, p6_p, p6_n)
+        # p2_a, p2_p, p2_n = TripletAccuracy(margin=4)(p2_a, p2_p, p2_n)
+        # p3_a, p3_p, p3_n = TripletAccuracy(margin=7)(p3_a, p3_p, p3_n)
+        # p4_a, p4_p, p4_n = TripletAccuracy(margin=10)(p4_a, p4_p, p4_n)
+        p5_a, p5_p, p5_n = TripletAccuracy(margin=13)(p5_a, p5_p, p5_n)
+        p6_a, p6_p, p6_n = TripletAccuracy(margin=95)(p6_a, p6_p, p6_n)
         p6 = layers.Concatenate()([p6_a, p6_p, p6_n])
         model = tf.keras.models.Model(
             inputs=[input_a, input_p, input_n], outputs=p6

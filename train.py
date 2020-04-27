@@ -162,7 +162,7 @@ else:
     )
     model.compile(optimizer)
 
-# model.load_weights(".\\logs\\20200124-154942\\siamese.h5")
+model.load_weights(".\\logs\\training_resnet\\siamese.h5")
 
 if __name__ == "__main__":
     log_dir = "logs\\" + "training_resnet"

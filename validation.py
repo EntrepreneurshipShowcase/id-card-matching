@@ -3,7 +3,7 @@ import datetime
 import numpy as np
 import tensorflow as tf
 
-from model import get_siamese_model
+from fpn_model import get_siamese_model
 from losses import triplet_loss
 from metrics import triplet_accuracy
 
@@ -121,8 +121,8 @@ else:
     )
     model.compile(optimizer)
 
-model.load_weights(".\\logs\\training\\siamese.h5")
+model.load_weights(".\\logs\\training_resnet\\siamese.h5")
 
 if __name__ == "__main__":
 
-    model.evaluate(val_dataset, steps=200)
+    model.evaluate(val_dataset, steps=400)
