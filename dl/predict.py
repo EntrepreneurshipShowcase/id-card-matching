@@ -1,5 +1,6 @@
 import tensorflow as tf
 import os
+import cv2
 
 from model import get_siamese_model
 
@@ -10,23 +11,19 @@ class Predictor:
         self.model.load_weights(
             "./siamese.h5", by_name=True
         )
+        #TODO Determine optimal threshold
         self.threshold = 95
-
+    #TODO Fix input processing
     def load_and_preprocess_files(self, id_image_file, test_image_file):
-        id_image = tf.reshape(
+        id_image = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
             tf.image.resize(
-                tf.reshape(
-                    tf.keras.applications.inception_resnet_v2.preprocess_input(
                         tf.io.decode_image(
                             tf.io.read_file(id_image_file), dtype=tf.float32
-                        )
-                    ),
-                    (250, 250, 3),
-                ),
-                (224, 224),
+                        ),
+                (96, 96),
             ),
-            (1, 224, 224, 3),
-        )
+            (1, 96, 96, 3),
+        ))
         test_image = tf.reshape(
             tf.image.resize(
                 tf.reshape(
@@ -44,13 +41,10 @@ class Predictor:
         return id_image, test_image
 
     def load_and_preprocess_image(self, image):
-        image = tf.reshape(
-            tf.image.resize(
-                tf.keras.applications.inception_resnet_v2.preprocess_input(image),
-                (224, 224),
-            ),
-            (1, 224, 224, 3),
-        )
+        image = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
+                tf.image.resize(image, (96, 96)),
+            (1, 96, 96, 3),
+        ))
         return image
 
     def get_distance(self, id_vec, test_vec, cosine=False):
@@ -76,6 +70,8 @@ class Predictor:
 
     def get_vec(self, image):
         image = self.load_and_preprocess_image(image)
+        # cv2.imwrite(image[0], "./test.jpg")
+        # import ipdb; ipdb.set_trace()
         vec = self.model.predict(image)
         return vec
 

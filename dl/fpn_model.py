@@ -6,7 +6,6 @@ from metrics import triplet_accuracy
 from tensorflow.keras.applications import resnet
 
 import fpn
-import resnet50
 
 EMBEDDING_LAYER_DIM = 256
 

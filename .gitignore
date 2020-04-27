@@ -1,15 +1,16 @@
 Data/**
 env/**
+__pycache__/
 env_1/**
-lfw*/**
+lfw/
 .vscode/**
-__pycache__/**
-logs/**
+logs/
 Data.zip
 *.tfrecords
 *.png
 *.jpg
 # *.json
+*.ppm
 *.zip
-logs
-*.h5
+faces_uncropped/
+*.txt

@@ -9,8 +9,10 @@ TRAIN_STEPS = 500
 VAL_STEPS = 100
 LEARNING_RATE = 0.0001
 MIXED_PRECISION = False
+
 DATA_DIR = "./data/lfw/"  # "./Data/"
 NUM_FOLDERS = 1680  # 10575
+
 DISTRIBUTE = False
 
 def _bytes_feature(value):
