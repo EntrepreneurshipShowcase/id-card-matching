@@ -6,7 +6,7 @@ from dl.losses import triplet_loss
 from dl.metrics import triplet_accuracy
 from tensorflow.keras.applications import resnet
 
-import fpn
+import dl.fpn as fpn
 
 EMBEDDING_LAYER_DIM = 256
 
@@ -57,7 +57,7 @@ class TripletAccuracy(layers.Layer):
         return {"margin": self.margin}
 
 class Siamese(layers.Layer):
-    def __init__(self):
+    def __init__(self, input_shape):
         super(Siamese, self).__init__()
         self.global_pool = layers.GlobalMaxPool2D()
         self.embedding_p3 = Embedding()
@@ -65,13 +65,16 @@ class Siamese(layers.Layer):
         self.embedding_p5 = Embedding()
         self.embedding_p2 = Embedding()
         self.embedding_p6 = Embedding()
+        self.inp_shape = input_shape
         # self.backbone = resnet50.ResNet(101)
         # self.backbone.load_weights("./faster_rcnn.h5", by_name=True)
-        base_model = resnet.ResNet50(include_top=False, weights="imagenet")
+        base_model = resnet.ResNet50(include_top=False, input_shape=input_shape, weights="imagenet")
         self.backbone = tf.keras.Model(inputs=base_model.input, outputs=(base_model.get_layer("conv2_block3_out").output, base_model.get_layer("conv3_block4_out").output, base_model.get_layer("conv4_block6_out").output, base_model.output))
         # self.backbone.trainable = False
         self.neck = fpn.FPN(
             name='fpn')
+    def get_config(self):
+        return {"base_input": self.inp_shape}
 
     def call(self, inputs, training):
         C2_a, C3_a, C4_a, C5_a = self.backbone(inputs, training=training)
@@ -94,8 +97,8 @@ class Siamese(layers.Layer):
         return p2_a, p3_a, p4_a, p5_a, p6_a
 
 def get_siamese_model(training=True):
-    siamese = Siamese()
-    inp_shape = (224, 224, 3)
+    inp_shape = (96, 96, 3)
+    siamese = Siamese(inp_shape)
     if training:
         input_a = layers.Input(inp_shape, name="anchor")
         input_p = layers.Input(inp_shape, name="positive")

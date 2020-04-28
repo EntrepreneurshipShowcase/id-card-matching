@@ -2,14 +2,14 @@ import tensorflow as tf
 import os
 import cv2
 
-from dl.model import get_siamese_model
+from dl.fpn_model import get_siamese_model
 
 
 class Predictor:
     def __init__(self):
         self.model = get_siamese_model(training=False)
         self.model.load_weights(
-            "./siamese.h5", by_name=True
+            "./dl/siamese.h5", by_name=True
         )
         #TODO Determine optimal threshold
         self.threshold = 95
@@ -41,9 +41,10 @@ class Predictor:
         return id_image, test_image
 
     def load_and_preprocess_image(self, image):
+        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         image = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
-                tf.image.resize(image, (96, 96)),
-            (1, 96, 96, 3),
+                tf.image.resize(image, (224, 224)),
+            (1, 224, 224, 3),
         ))
         return image
 
@@ -72,9 +73,15 @@ class Predictor:
         image = self.load_and_preprocess_image(image)
         # cv2.imwrite(image[0], "./test.jpg")
         # import ipdb; ipdb.set_trace()
-        vec = self.model.predict(image)
+        vec = self.model.predict(image)[0]
         return vec
-
+    def is_same_face(self, vec1, vec2, debug=True):
+        dis = self.get_distance(vec1, vec2)
+        print(dis)
+        if dis < self.threshold:
+            return True
+        else:
+            return False
     def vec_distance(self, id_image, test_image):
         id_vec = self.get_vec(id_image)
         test_vec = self.get_vec(test_image)

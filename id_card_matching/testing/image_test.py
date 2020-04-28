@@ -1,19 +1,23 @@
-import facial_reid.id_database_fr as db
+import database_ops.id_database as db
 
 import cv2
 import numpy as np
 import argparse
 
+import dl.predict
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--image")
 driver = db.DataDriver()
-
+predictor = dl.predict.Predictor()
 
 
 if __name__ == "__main__":
     args = parser.parse_args()
     image_file = args.image
     image = cv2.imread(image_file)
-    id, name = driver.lookup_person(image)
+    vec = predictor.get_vec(image)
+    if image is None:
+        print("Error, exiting")
+    id, name = driver.lookup_person(vec)
     print(name)

@@ -53,14 +53,7 @@ def _process_image(anchor, positive, negative):
     anchor_img = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
         tf.image.resize(
             tf.reshape(
-<<<<<<< HEAD:train.py
-                tf.keras.applications.resnet_v2.preprocess_input(
-                    tf.io.decode_image(anchor, dtype=tf.float32)
-                ),
-                (250, 250, 3),
-=======
                     tf.io.decode_image(anchor, dtype=tf.float32), (64, 64, 3),
->>>>>>> master:dl/train.py
             ),
             (96, 96),
         ),
@@ -69,14 +62,7 @@ def _process_image(anchor, positive, negative):
     positive_img = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
         tf.image.resize(
             tf.reshape(
-<<<<<<< HEAD:train.py
-                tf.keras.applications.resnet_v2.preprocess_input(
-                    tf.io.decode_image(positive, dtype=tf.float32)
-                ),
-                (250, 250, 3),
-=======
                     tf.io.decode_image(positive, dtype=tf.float32), (64, 64, 3),
->>>>>>> master:dl/train.py
             ),
             (96, 96),
         ),
@@ -85,14 +71,7 @@ def _process_image(anchor, positive, negative):
     negative_img = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
         tf.image.resize(
             tf.reshape(
-<<<<<<< HEAD:train.py
-                tf.keras.applications.resnet_v2.preprocess_input(
-                    tf.io.decode_image(negative, dtype=tf.float32)
-                ),
-                (250, 250, 3),
-=======
                     tf.io.decode_image(negative, dtype=tf.float32), (64, 64, 3),
->>>>>>> master:dl/train.py
             ),
             (96, 96),
         ),
@@ -130,11 +109,6 @@ val_dataset = val_dataset.map(
     num_parallel_calls=tf.data.experimental.AUTOTUNE,
 )
 
-<<<<<<< HEAD:train.py
-
-
-=======
->>>>>>> master:dl/train.py
 val_dataset = val_dataset.map(
     _process_image, num_parallel_calls=tf.data.experimental.AUTOTUNE
 )
@@ -180,17 +154,10 @@ else:
     )
     model.compile(optimizer)
 
-<<<<<<< HEAD:train.py
-model.load_weights(".\\logs\\training_resnet\\siamese.h5")
+# model.load_weights(".\\logs\\cropped\\siamese.h5")
 
 if __name__ == "__main__":
-    log_dir = "logs\\" + "training_resnet"
-=======
-# model.load_weights(".\\logs\\training_large_margin\\siamese.h5")
-
-if __name__ == "__main__":
-    log_dir = "logs\\" + "cropped"
->>>>>>> master:dl/train.py
+    log_dir = ".\\dl\\logs\\" + "cropped"
     tensorboard_callback = tf.keras.callbacks.TensorBoard(
         log_dir=log_dir, histogram_freq=1
     )

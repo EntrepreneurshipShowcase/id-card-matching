@@ -10,7 +10,7 @@ VAL_STEPS = 100
 LEARNING_RATE = 0.0001
 MIXED_PRECISION = False
 
-DATA_DIR = "./data/lfw/"  # "./Data/"
+DATA_DIR = "./data/lfwcrop_color/faces/"  # "./Data/"
 NUM_FOLDERS = 1680  # 10575
 
 DISTRIBUTE = False
@@ -59,17 +59,19 @@ def image_example(anchor, positive, negative):
     }
 
     return tf.train.Example(features=tf.train.Features(feature=feature))
+def main():
+  record_file = 'triplet_data_test.tfrecords'
 
-record_file = 'triplet_data_test.tfrecords'
+  data_iterator = get_triplet_data()
 
-data_iterator = get_triplet_data()
-
-num_save = 100000
-idx = 0
-with tf.io.TFRecordWriter(record_file) as writer:
-    for anchor, positive, negative in tqdm(data_iterator, total=num_save):
-        idx += 1
-        tf_example = image_example(anchor, positive, negative)
-        writer.write(tf_example.SerializeToString())
-        if idx > num_save:
-            break
+  num_save = 100000
+  idx = 0
+  with tf.io.TFRecordWriter(record_file) as writer:
+      for anchor, positive, negative in tqdm(data_iterator, total=num_save):
+          idx += 1
+          tf_example = image_example(anchor, positive, negative)
+          writer.write(tf_example.SerializeToString())
+          if idx > num_save:
+              break
+if __name__ == "__main__":
+  main()

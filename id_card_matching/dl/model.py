@@ -90,14 +90,9 @@ class TripletAccuracy(layers.Layer):
 
 
 def get_siamese_model(training=True):
-<<<<<<< HEAD:model.py
     inp_shape = (299, 299, 3)
     base_model = resnet_v2.ResNet50V2(include_top=False, weights="imagenet")
     base_model.trainable=False
-=======
-    inp_shape = (96, 96, 3)
-    base_model = mobilenet_v2.MobileNetV2(include_top=False, input_shape=(96, 96, 3))
->>>>>>> master:dl/model.py
 
     if training:
         input_a = layers.Input(inp_shape, name="anchor")
