@@ -9,14 +9,14 @@ cap.set(3, 640)  # set Width
 cap.set(4, 640)  # set Height
 driver = db.DataDriver()
 
-driver.add_person("Rohil", 1, cv2.imread("./images/ids/test_rohil.jpg"))
-driver.add_person("Tanish", 2, cv2.imread("./images/ids/test_tanish.jpg"))
-driver.add_person("Ayush", 3, cv2.imread("./images/ids/test_ayush.jpg"))
-driver.add_person("Sai", 4, cv2.imread("./images/ids/test_sai.jpg"))
-driver.add_person("Megna", 5, cv2.imread("./images/ids/test_megna.jpg"))
-driver.add_person("Jayani", 6, cv2.imread("./images/ids/test_jayani.jpg"))
+# driver.add_person("Rohil", 1, cv2.imread("./images/ids/test_rohil.jpg"))
+# driver.add_person("Tanish", 2, cv2.imread("./images/ids/test_tanish.jpg"))
+# driver.add_person("Ayush", 3, cv2.imread("./images/ids/test_ayush.jpg"))
+# driver.add_person("Sai", 4, cv2.imread("./images/ids/test_sai.jpg"))
+# driver.add_person("Megna", 5, cv2.imread("./images/ids/test_megna.jpg"))
+# driver.add_person("Jayani", 6, cv2.imread("./images/ids/test_jayani.jpg"))
 
-if __name__ == "__main__":
+def main():
     while True:
         ret, frame = cap.read()
         frame = cv2.flip(frame, 1)  # Flip camera vertically
@@ -31,3 +31,5 @@ if __name__ == "__main__":
             break
     cap.release()
     cv2.destroyAllWindows()
+if __name__ == "__main__":
+    main()

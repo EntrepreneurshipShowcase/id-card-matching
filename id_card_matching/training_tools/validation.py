@@ -151,6 +151,8 @@ else:
 
 model.load_weights(".\\siamese.h5")
 
+def main():
+    model.evaluate(val_dataset, steps=400)
 if __name__ == "__main__":
 
-    model.evaluate(val_dataset, steps=400)
+    

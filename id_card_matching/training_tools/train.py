@@ -155,8 +155,7 @@ else:
     model.compile(optimizer)
 
 # model.load_weights(".\\logs\\cropped\\siamese.h5")
-
-if __name__ == "__main__":
+def main():
     log_dir = ".\\dl\\logs\\" + "cropped"
     tensorboard_callback = tf.keras.callbacks.TensorBoard(
         log_dir=log_dir, histogram_freq=1
@@ -175,3 +174,5 @@ if __name__ == "__main__":
         workers=1,
         use_multiprocessing=False,
     )
+if __name__ == "__main__":
+    main()
