@@ -1,4 +1,3 @@
-import RPi.GPIO as GPIO
 import mfrc522
 import numpy as np
 
@@ -8,7 +7,7 @@ class RFID:
     def __enter__(self):
         self.reader = mfrc522.SimpleMFRC522()
     def __exit__(self, type, value, traceback):
-        GPIO.cleanup()
+        pass
     def write(self, id, name, vec=None):
         if vec is not None:
             text = f"{id}/{name}/{np.array2string(vec)}"
