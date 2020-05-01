@@ -1,7 +1,8 @@
 import aspen.aspen_base as aspen
 from raspberrypi_ops import button, led, camera
 from random import random
-
+import RPi.GPIO as GPIO
+GPIO.setmode(GPIO.BCM)
 class AspenPi(aspen.Aspen):
     def __init__(self, button_pins, led_pins, use_card_vec=False):
         super(AspenPi, self).__init__(use_card_vec=use_card_vec)
