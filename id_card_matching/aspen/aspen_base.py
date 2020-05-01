@@ -2,7 +2,7 @@ from database_ops import id_database
 from dl import predict_fr as predict
 from identification_ops import add_person, verify_id
 from raspberrypi_ops import camera, rfid
-
+import RPi.GPIO as GPIO
 class Aspen:
     def __init__(self, use_card_vec=False):
         self.predictor = predict.Predictor()
