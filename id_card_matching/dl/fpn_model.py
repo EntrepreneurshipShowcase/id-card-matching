@@ -8,19 +8,24 @@ from tensorflow.keras.applications import resnet
 
 import dl.fpn as fpn
 
-EMBEDDING_LAYER_DIM = 256
+EMBEDDING_LAYER_DIM = 128
 
 
 class Embedding(layers.Layer):
     def __init__(self):
         super(Embedding, self).__init__()
         self.global_pool = layers.GlobalMaxPool2D()
-        self.conv1 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
-        self.bn = layers.BatchNormalization()
+        self.conv1 = layers.Conv2D(EMBEDDING_LAYER_DIM*2, (2, 2))
+        self.bn1 = layers.BatchNormalization()
+        self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
+        self.bn2 = layers.BatchNormalization()
 
     def call(self, x):
         x = self.conv1(x)
-        x = self.bn(x)
+        x = self.bn1(x)
+        x = layers.Activation("relu")(x)
+        x = self.conv2(x)
+        x = self.bn2(x)
         x = layers.Activation("relu")(x)
         x = self.global_pool(x)
         x = layers.Activation("linear", dtype=tf.float32)(x)
@@ -125,8 +130,8 @@ def get_siamese_model(training=True):
         # p2_a, p2_p, p2_n = TripletAccuracy(margin=4)(p2_a, p2_p, p2_n)
         # p3_a, p3_p, p3_n = TripletAccuracy(margin=7)(p3_a, p3_p, p3_n)
         # p4_a, p4_p, p4_n = TripletAccuracy(margin=10)(p4_a, p4_p, p4_n)
-        p5_a, p5_p, p5_n = TripletAccuracy(margin=13)(p5_a, p5_p, p5_n)
-        p6_a, p6_p, p6_n = TripletAccuracy(margin=95)(p6_a, p6_p, p6_n)
+        # p5_a, p5_p, p5_n = TripletAccuracy(margin=13)(p5_a, p5_p, p5_n)
+        p6_a, p6_p, p6_n = TripletAccuracy(margin=85)(p6_a, p6_p, p6_n)
         p6 = layers.Concatenate()([p6_a, p6_p, p6_n])
         model = tf.keras.models.Model(
             inputs=[input_a, input_p, input_n], outputs=p6

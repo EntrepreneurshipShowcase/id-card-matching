@@ -6,6 +6,7 @@ from firebase_admin import firestore
 import cv2
 import functools
 
+import dl.predict
 # import dl.predict
 
 class IDDatabase:
@@ -34,8 +35,11 @@ class IDDatabase:
 
 
 class DataDriver:
-    def __init__(self):
-        self.predictor = dl.predict.Predictor()
+    def __init__(self, predictor=None):
+        if predictor is None:
+            self.predictor = dl.predict.Predictor()
+        else:
+            self.predictor = predictor
         self.database = IDDatabase(self.predictor)
         # Immediately get all ids
         self.database.doc.on_snapshot(self.on_update)

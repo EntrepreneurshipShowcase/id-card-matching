@@ -11,8 +11,7 @@ parser.add_argument("--image")
 driver = db.DataDriver()
 predictor = dl.predict.Predictor()
 
-
-if __name__ == "__main__":
+def main():
     args = parser.parse_args()
     image_file = args.image
     image = cv2.imread(image_file)
@@ -21,3 +20,5 @@ if __name__ == "__main__":
         print("Error, exiting")
     id, name = driver.lookup_person(vec)
     print(name)
+if __name__ == "__main__":
+    main()

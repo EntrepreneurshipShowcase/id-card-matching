@@ -4,16 +4,16 @@ import numpy as np
 import tensorflow as tf
 
 # from model import get_siamese_model
-from dl.fpn_model import get_siamese_model
+from dl.model_simple import get_siamese_model
 from dl.losses import triplet_loss
 from dl.metrics import triplet_accuracy
 
 NUM_EPOCHS = 1000
-BATCH_SIZE = 16
+BATCH_SIZE = 32
 
 TRAIN_STEPS = 500
 VAL_STEPS = 100
-LEARNING_RATE = 0.0005
+LEARNING_RATE = 0.0001
 MIXED_PRECISION = False
 DATA_DIR = "./lfw/lfw/"  # "./Data/"
 NUM_FOLDERS = 1680  # 10575
@@ -39,7 +39,7 @@ def _parse_image_function(example_proto):
     return tf.io.parse_single_example(example_proto, image_feature_description)
 
 
-dataset = tf.data.TFRecordDataset("./triplet_data.tfrecords")
+dataset = tf.data.TFRecordDataset("D:/id-card-matching/tfrecords/triplet_data_crop.tfrecords")
 dataset = dataset.map(
     _parse_image_function, num_parallel_calls=tf.data.experimental.AUTOTUNE
 )
@@ -100,7 +100,7 @@ train_dataset = dataset.map(
 
 
 
-val_dataset = tf.data.TFRecordDataset("./triplet_data_test.tfrecords")
+val_dataset = tf.data.TFRecordDataset("D:/id-card-matching/tfrecords/triplet_data_test_crop.tfrecords")
 val_dataset = val_dataset.map(
     _parse_image_function, num_parallel_calls=tf.data.experimental.AUTOTUNE
 )
@@ -156,7 +156,7 @@ else:
 
 # model.load_weights(".\\logs\\cropped\\siamese.h5")
 def main():
-    log_dir = ".\\dl\\logs\\" + "cropped"
+    log_dir = "D:\\id-card-matching\\logs\\" + "cropped_small"
     tensorboard_callback = tf.keras.callbacks.TensorBoard(
         log_dir=log_dir, histogram_freq=1
     )

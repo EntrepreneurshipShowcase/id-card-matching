@@ -3,48 +3,24 @@ import os
 import cv2
 
 from dl.fpn_model import get_siamese_model
-
+from dl.face_crop import FaceCrop
 
 class Predictor:
     def __init__(self):
+        self.face_cropper = FaceCrop()
         self.model = get_siamese_model(training=False)
-        self.model.load_weights(
-            "./dl/siamese.h5", by_name=True
-        )
+        self.model.load_weights("D:\\id-card-matching\\logs\\cropped_small\\siamese.h5", by_name=True)
+        self.model = get_siamese_model(training=False)
+        self.model.load_weights("D:\\id-card-matching\\logs\\cropped_small\\siamese.h5", by_name=True)
         #TODO Determine optimal threshold
-        self.threshold = 95
-    #TODO Fix input processing
-    def load_and_preprocess_files(self, id_image_file, test_image_file):
-        id_image = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
-            tf.image.resize(
-                        tf.io.decode_image(
-                            tf.io.read_file(id_image_file), dtype=tf.float32
-                        ),
-                (96, 96),
-            ),
-            (1, 96, 96, 3),
-        ))
-        test_image = tf.reshape(
-            tf.image.resize(
-                tf.reshape(
-                    tf.keras.applications.inception_resnet_v2.preprocess_input(
-                        tf.io.decode_image(
-                            tf.io.read_file(test_image_file), dtype=tf.float32
-                        )
-                    ),
-                    (250, 250, 3),
-                ),
-                (224, 224),
-            ),
-            (1, 224, 224, 3),
-        )
-        return id_image, test_image
+        self.threshold = 70
 
     def load_and_preprocess_image(self, image):
         image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image = self.face_cropper.crop(image)
         image = tf.keras.applications.inception_resnet_v2.preprocess_input(tf.reshape(
-                tf.image.resize(image, (224, 224)),
-            (1, 224, 224, 3),
+                tf.image.resize(image, (96, 96)),
+            (1, 96, 96, 3),
         ))
         return image
 
@@ -56,18 +32,6 @@ class Predictor:
                 tf.math.reduce_sum(tf.math.square(id_vec - test_vec), axis=-1)
             )
         return distance
-
-    def predict_on_file(self, id_image_file, test_image_file):
-        id_image, test_image = self.load_and_preprocess_files(
-            id_image_file, test_image_file
-        )
-        id_vec = self.model.predict(id_image)
-        test_vec = self.model.predict(test_image)
-        print(self.get_distance(id_vec, test_vec))
-        if self.get_distance(id_vec, test_vec) < self.threshold:
-            return True
-        else:
-            return False
 
     def get_vec(self, image):
         image = self.load_and_preprocess_image(image)
