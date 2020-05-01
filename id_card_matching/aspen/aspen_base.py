@@ -1,5 +1,5 @@
 from database_ops import id_database
-from dl import predict
+from dl import predict_fr as predict
 from identification_ops import add_person, verify_id
 from raspberrypi_ops import camera, rfid
 
