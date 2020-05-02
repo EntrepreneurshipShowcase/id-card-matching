@@ -6,7 +6,7 @@ from firebase_admin import firestore
 import cv2
 import functools
 
-import dl.predict
+import dl.predict_fr as predict
 # import dl.predict
 
 class IDDatabase:
@@ -37,7 +37,7 @@ class IDDatabase:
 class DataDriver:
     def __init__(self, predictor=None):
         if predictor is None:
-            self.predictor = dl.predict.Predictor()
+            self.predictor = predict.Predictor()
         else:
             self.predictor = predictor
         self.database = IDDatabase(self.predictor)
@@ -61,8 +61,8 @@ class DataDriver:
         return matched_id
 
     def verify(self, id, vec, debug=False):
-        return self.predictor.is_same_person(
+        return self.predictor.is_same_face(
                 vec, np.array(self.id_vectors[str(id)]["vector"]), debug=debug
         )
     def add_person(self, name, id, vec, rfid=None):
-        self.database.add_person(name, id, vec)
+        self.database.add_person(name, id, vec, rfid=rfid)
