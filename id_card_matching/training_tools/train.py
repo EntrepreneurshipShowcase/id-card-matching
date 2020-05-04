@@ -156,7 +156,7 @@ else:
 
 # model.load_weights(".\\logs\\cropped\\siamese.h5")
 def main():
-    log_dir = "D:\\id-card-matching\\logs\\" + "cropped_small"
+    log_dir = "D:\\id-card-matching\\logs\\" + "cropped_average_small"
     tensorboard_callback = tf.keras.callbacks.TensorBoard(
         log_dir=log_dir, histogram_freq=1
     )
