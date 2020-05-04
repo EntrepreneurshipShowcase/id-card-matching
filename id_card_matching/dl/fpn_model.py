@@ -14,7 +14,7 @@ EMBEDDING_LAYER_DIM = 128
 class Embedding(layers.Layer):
     def __init__(self):
         super(Embedding, self).__init__()
-        self.global_pool = layers.GlobalMaxPool2D()
+        self.global_pool = layers.GlobalAveragePooling2D()
         self.conv1 = layers.Conv2D(EMBEDDING_LAYER_DIM*2, (2, 2))
         self.bn1 = layers.BatchNormalization()
         self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))

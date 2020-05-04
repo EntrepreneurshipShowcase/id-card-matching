@@ -7,7 +7,7 @@ from dl.model_simple import get_siamese_model
 from dl.losses import triplet_loss
 from dl.metrics import triplet_accuracy
 
-BATCH_SIZE = 32
+BATCH_SIZE = 2
 DISTRIBUTE = False
 LEARNING_RATE = 0.0001
 
@@ -28,7 +28,10 @@ def _parse_image_function(example_proto):
     return tf.io.parse_single_example(example_proto, image_feature_description)
 
 
-val_dataset = tf.data.TFRecordDataset("D:/id-card-matching/tfrecords/triplet_data_test_crop.tfrecords")
+# val_dataset = tf.data.TFRecordDataset("D:/id-card-matching/tfrecords/triplet_data_test_crop.tfrecords")
+val_dataset = tf.data.TFRecordDataset(
+    "/home/tanish/code/triplet_data_test_crop.tfrecords")
+
 val_dataset = val_dataset.map(
     _parse_image_function, num_parallel_calls=tf.data.experimental.AUTOTUNE
 )
