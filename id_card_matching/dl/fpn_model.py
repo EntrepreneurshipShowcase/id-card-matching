@@ -197,6 +197,7 @@ def get_siamese_model(training=True):
             inputs=[input_a, input_p, input_n], outputs=p6
         )
     else:
+        input_x = layers.Input(inp_shape)
         C2_x, C3_x, C4_x, C5_x = backbone(input_x, training=training)
         P2_x, P3_x, P4_x, P5_x, P6_x = neck([C2_x, C3_x, C4_x, C5_x], training=training)
 
