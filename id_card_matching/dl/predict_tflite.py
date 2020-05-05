@@ -1,6 +1,7 @@
 import tflite_runtime.interpreter as tflite
 import cv2
 import numpy as np
+import tensorflow as tf
 
 from dl.face_crop import FaceCrop
 
@@ -36,8 +37,8 @@ class Predictor:
             print("No face detected, return null")
             return np.zeros((128, ))
     def is_same_face(self, vec1, vec2, debug=True):
-        dis = tf.math.sqrt(
-                tf.math.reduce_sum(tf.math.square(vec1 - vec2), axis=-1)
+        dis = np.sqrt(
+                np.reduce_sum(tf.math.square(vec1 - vec2), axis=-1)
             )
         if dis < self.threshold:
             return True
