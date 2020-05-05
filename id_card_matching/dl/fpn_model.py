@@ -103,6 +103,19 @@ class Siamese(layers.Layer):
 
 def get_siamese_model(training=True):
     inp_shape = (96, 96, 3)
+    base_model = resnet.ResNet50(include_top=False, input_shape=inp_shape, weights="imagenet")
+    backbone = tf.keras.Model(inputs=base_model.input, outputs=(base_model.get_layer("conv2_block3_out").output, base_model.get_layer("conv3_block4_out").output, base_model.get_layer("conv4_block6_out").output, base_model.output))
+
+    embedding_p3 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
+    embedding_p4 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
+    embedding_p5 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
+    embedding_p2 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
+    embedding_p6 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
+    # backbone = resnet50.ResNet(101)
+    # backbone.load_weights("./faster_rcnn.h5", by_name=True)
+    # backbone.trainable = False
+    neck = fpn.FPN(
+        name='fpn')
     if training:
         input_a = layers.Input(inp_shape, name="anchor")
         input_p = layers.Input(inp_shape, name="positive")
@@ -117,19 +130,6 @@ def get_siamese_model(training=True):
         #     ),
         # )
 
-        base_model = resnet.ResNet50(include_top=False, input_shape=inp_shape, weights="imagenet")
-        backbone = tf.keras.Model(inputs=base_model.input, outputs=(base_model.get_layer("conv2_block3_out").output, base_model.get_layer("conv3_block4_out").output, base_model.get_layer("conv4_block6_out").output, base_model.output))
-
-        embedding_p3 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
-        embedding_p4 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
-        embedding_p5 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
-        embedding_p2 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
-        embedding_p6 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
-        # backbone = resnet50.ResNet(101)
-        # backbone.load_weights("./faster_rcnn.h5", by_name=True)
-        # backbone.trainable = False
-        neck = fpn.FPN(
-            name='fpn')
         C2_a, C3_a, C4_a, C5_a = backbone(input_a, training=training)
         P2_a, P3_a, P4_a, P5_a, P6_a = neck([C2_a, C3_a, C4_a, C5_a], training=training)
 
