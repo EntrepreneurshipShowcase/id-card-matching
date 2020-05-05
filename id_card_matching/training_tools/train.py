@@ -4,7 +4,7 @@ import numpy as np
 import tensorflow as tf
 
 # from model import get_siamese_model
-from dl.model_simple import get_siamese_model
+from dl.model_large import get_siamese_model
 from dl.losses import triplet_loss
 from dl.metrics import triplet_accuracy
 
@@ -13,7 +13,7 @@ BATCH_SIZE = 32
 
 TRAIN_STEPS = 500
 VAL_STEPS = 100
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.01
 MIXED_PRECISION = False
 DATA_DIR = "./lfw/lfw/"  # "./Data/"
 NUM_FOLDERS = 1680  # 10575
@@ -154,7 +154,7 @@ else:
     )
     model.compile(optimizer)
 
-# model.load_weights(".\\logs\\cropped\\siamese.h5")
+# model.load_weights(".\\logs\\cropped_average_small\\siamese.h5")
 def main():
     log_dir = "D:\\id-card-matching\\logs\\" + "cropped_average_small"
     tensorboard_callback = tf.keras.callbacks.TensorBoard(

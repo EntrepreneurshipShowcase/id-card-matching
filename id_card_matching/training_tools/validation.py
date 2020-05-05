@@ -3,7 +3,7 @@ import datetime
 import numpy as np
 import tensorflow as tf
 
-from dl.model_simple import get_siamese_model
+from dl.model_large import get_siamese_model
 from dl.losses import triplet_loss
 from dl.metrics import triplet_accuracy
 
@@ -28,9 +28,9 @@ def _parse_image_function(example_proto):
     return tf.io.parse_single_example(example_proto, image_feature_description)
 
 
-# val_dataset = tf.data.TFRecordDataset("D:/id-card-matching/tfrecords/triplet_data_test_crop.tfrecords")
-val_dataset = tf.data.TFRecordDataset(
-    "/home/tanish/code/triplet_data_test_crop.tfrecords")
+val_dataset = tf.data.TFRecordDataset("D:/id-card-matching/tfrecords/triplet_data_test_crop.tfrecords")
+# val_dataset = tf.data.TFRecordDataset(
+#     "/home/tanish/code/triplet_data_test_crop.tfrecords")
 
 val_dataset = val_dataset.map(
     _parse_image_function, num_parallel_calls=tf.data.experimental.AUTOTUNE
@@ -153,7 +153,7 @@ else:
     )
     model.compile(optimizer)
 
-# model.load_weights("D:\\id-card-matching\\logs\\cropped_small\\siamese.h5")
+model.load_weights("D:\\id-card-matching\\logs\\cropped_average_small\\siamese.h5")
 # import ipdb;ipdb.set_trace()
 def main():
     model.evaluate(val_dataset, steps=400)

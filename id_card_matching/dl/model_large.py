@@ -6,7 +6,7 @@ from tensorflow.keras.applications import resnet
 from dl.losses import triplet_loss
 from dl.metrics import triplet_accuracy
 
-EMBEDDING_LAYER_DIM = 512
+EMBEDDING_LAYER_DIM = 128
 
 
 class BaseEmbedding(layers.Layer):
@@ -14,11 +14,13 @@ class BaseEmbedding(layers.Layer):
         super(BaseEmbedding, self).__init__()
         self.global_pool = layers.GlobalAveragePooling2D()
         self.conv1 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
-
+        self.bn = layers.BatchNormalization()
     def call(self, inputs):
         x = self.conv1(inputs)
+        x = self.bn(x)
+        x = layers.ReLU()(x)
         x = self.global_pool(x)
-        x = layers.Activation("linear", dtype=tf.float32)(x)
+        x = layers.Activation("softmax", dtype=tf.float32)(x)
         return x
 
 
@@ -26,17 +28,20 @@ class Shift1Embedding(layers.Layer):
     def __init__(self):
         super(Shift1Embedding, self).__init__()
         self.global_pool = layers.GlobalAveragePooling2D()
-        self.conv1 = layers.Conv2D(1024, (3, 3))
-        self.bn = layers.BatchNormalization()
+        self.conv1 = layers.Conv2D(256, (3, 3))
+        self.bn_1 = layers.BatchNormalization()
+        self.bn_2 = layers.BatchNormalization()
         self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
 
     def call(self, inputs):
         x = self.conv1(inputs)
-        x = self.bn(x)
+        x = self.bn_1(x)
         x = layers.ReLU()(x)
         x = self.conv2(x)
+        x = self.bn_2(x)
+        x = layers.ReLU()(x)
         x = self.global_pool(x)
-        x = layers.Activation("linear", dtype=tf.float32)(x)
+        x = layers.Activation("softmax", dtype=tf.float32)(x)
         return x
 
 
@@ -44,50 +49,59 @@ class Shift2Embedding(layers.Layer):
     def __init__(self):
         super(Shift2Embedding, self).__init__()
         self.global_pool = layers.GlobalAveragePooling2D()
-        self.conv1 = layers.Conv2D(512, (3, 3), (2, 2))
-        self.bn = layers.BatchNormalization()
+        self.conv1 = layers.Conv2D(128, (3, 3), (2, 2))
+        self.bn_1 = layers.BatchNormalization()
+        self.bn_2 = layers.BatchNormalization()
         self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
 
     def call(self, inputs):
         x = self.conv1(inputs)
-        x = self.bn(x)
+        x = self.bn_1(x)
         x = layers.ReLU()(x)
         x = self.conv2(x)
+        x = self.bn_2(x)
+        x = layers.ReLU()(x)
         x = self.global_pool(x)
-        x = layers.Activation("linear", dtype=tf.float32)(x)
+        x = layers.Activation("softmax", dtype=tf.float32)(x)
         return x
 
 class Shift3Embedding(layers.Layer):
     def __init__(self):
         super(Shift3Embedding, self).__init__()
         self.global_pool = layers.GlobalAveragePooling2D()
-        self.conv1 = layers.Conv2D(256, (7, 7), (3, 3))
-        self.bn = layers.BatchNormalization()
+        self.conv1 = layers.Conv2D(64, (3, 3), (4, 4))
+        self.bn_1 = layers.BatchNormalization()
+        self.bn_2 = layers.BatchNormalization()
         self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
 
     def call(self, inputs):
         x = self.conv1(inputs)
-        x = self.bn(x)
+        x = self.bn_1(x)
         x = layers.ReLU()(x)
         x = self.conv2(x)
+        x = self.bn_2(x)
+        x = layers.ReLU()(x)
         x = self.global_pool(x)
-        x = layers.Activation("linear", dtype=tf.float32)(x)
+        x = layers.Activation("softmax", dtype=tf.float32)(x)
         return x
 class Shift4Embedding(layers.Layer):
     def __init__(self):
         super(Shift4Embedding, self).__init__()
         self.global_pool = layers.GlobalAveragePooling2D()
-        self.conv1 = layers.Conv2D(128, (11, 11), (4, 4))
-        self.bn = layers.BatchNormalization()
+        self.conv1 = layers.Conv2D(32, (11, 11), (4, 4))
+        self.bn_1 = layers.BatchNormalization()
+        self.bn_2 = layers.BatchNormalization()
         self.conv2 = layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1))
 
     def call(self, inputs):
         x = self.conv1(inputs)
-        x = self.bn(x)
+        x = self.bn_1(x)
         x = layers.ReLU()(x)
         x = self.conv2(x)
+        x = self.bn_2(x)
+        x = layers.ReLU()(x)
         x = self.global_pool(x)
-        x = layers.Activation("linear", dtype=tf.float32)(x)
+        x = layers.Activation("softmax", dtype=tf.float32)(x)
         return x
 
 class TripletLoss(layers.Layer):
@@ -121,7 +135,7 @@ class TripletAccuracy(layers.Layer):
 
 
 def get_siamese_model(training=True):
-    inp_shape = (224, 224, 3)
+    inp_shape = (96, 96, 3)
     base_model = resnet.ResNet50(include_top=False, weights="imagenet")
     base = tf.keras.Model(inputs=base_model.input, outputs=(base_model.output, base_model.get_layer("conv4_block6_out").output, base_model.get_layer("conv3_block4_out").output, base_model.get_layer("conv2_block3_out").output))
     if training:
@@ -146,7 +160,7 @@ def get_siamese_model(training=True):
         base_n = base_embedding(base_n)
 
         base_a, base_p, base_n = TripletLoss(margin=4)(base_a, base_p, base_n)
-        base_a, base_p, base_n = TripletAccuracy(margin=55)(base_a, base_p, base_n)
+        # base_a, base_p, base_n = TripletAccuracy(margin=15)(base_a, base_p, base_n)
         # TripletLoss(margin=4)(base_a, base_p, base_n)
 
         shifted1_a = shift1_embedding(shifted1_a)
@@ -158,12 +172,12 @@ def get_siamese_model(training=True):
         shifted1_n = shift1_embedding(shifted1_n)
         shifted1_n = layers.Add()([shifted1_n, base_n])
 
-        shifted1_a, shifted1_p, shifted1_n = TripletLoss(margin=10)(
+        shifted1_a, shifted1_p, shifted1_n = TripletLoss(margin=7)(
             shifted1_a, shifted1_p, shifted1_n
         )
-        shifted1_a, shifted1_p, shifted1_n = TripletAccuracy(margin=10)(
-            shifted1_a, shifted1_p, shifted1_n
-        )
+        # shifted1_a, shifted1_p, shifted1_n = TripletAccuracy(margin=20)(
+        #     shifted1_a, shifted1_p, shifted1_n
+        # )
         # TripletLoss(margin=7)(shifted1_a, shifted1_p, shifted1_n)
 
         shifted2_a = shift2_embedding(shifted2_a)
@@ -174,10 +188,10 @@ def get_siamese_model(training=True):
 
         shifted2_n = shift2_embedding(shifted2_n)
         shifted2_n = layers.Add()([shifted2_n, shifted1_n])
-        shifted2_a, shifted2_p, shifted2_n = TripletLoss(margin=15)(
+        shifted2_a, shifted2_p, shifted2_n = TripletLoss(margin=10)(
             shifted2_a, shifted2_p, shifted2_n
         )
-        shifted2_a, shifted2_p, shifted2_n = TripletAccuracy(margin=15)(
+        shifted2_a, shifted2_p, shifted2_n = TripletAccuracy(margin=23)(
             shifted2_a, shifted2_p, shifted2_n
         )
 
@@ -190,7 +204,7 @@ def get_siamese_model(training=True):
         shifted3_n = shift3_embedding(shifted3_n)
         shifted3_n = layers.Add()([shifted3_n, shifted2_n])
 
-        shifted3_a, shifted3_p, shifted3_n = TripletLoss(margin=25)(
+        shifted3_a, shifted3_p, shifted3_n = TripletLoss(margin=15)(
             shifted3_a, shifted3_p, shifted3_n
         )
         shifted3_a, shifted3_p, shifted3_n = TripletAccuracy(margin=25)(
