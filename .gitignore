@@ -8,7 +8,7 @@ logs/
 Data.zip
 *.tfrecords
 *.png
-*.jpg
+# *.jpg
 # *.json
 *.ppm
 *.zip
