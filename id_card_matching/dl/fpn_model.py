@@ -120,11 +120,11 @@ def get_siamese_model(training=True):
         base_model = resnet.ResNet50(include_top=False, input_shape=inp_shape, weights="imagenet")
         backbone = tf.keras.Model(inputs=base_model.input, outputs=(base_model.get_layer("conv2_block3_out").output, base_model.get_layer("conv3_block4_out").output, base_model.get_layer("conv4_block6_out").output, base_model.output))
 
-        embedding_p3 = tf.keras.model.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
-        embedding_p4 = tf.keras.model.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
-        embedding_p5 = tf.keras.model.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
-        embedding_p2 = tf.keras.model.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
-        embedding_p6 = tf.keras.model.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
+        embedding_p3 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
+        embedding_p4 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
+        embedding_p5 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
+        embedding_p2 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
+        embedding_p6 = tf.keras.Sequential([layers.Conv2D(EMBEDDING_LAYER_DIM*2, layers.BatchNormalization(), (2, 2)), layers.Activation("relu"), layers.Conv2D(EMBEDDING_LAYER_DIM, (1, 1)), layers.BatchNormalization(), layers.Activation("relu"), layers.GlobalAveragePooling2D()])
         # backbone = resnet50.ResNet(101)
         # backbone.load_weights("./faster_rcnn.h5", by_name=True)
         # backbone.trainable = False
