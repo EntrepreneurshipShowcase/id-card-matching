@@ -114,8 +114,52 @@ def get_siamese_model(training=True):
     # backbone = resnet50.ResNet(101)
     # backbone.load_weights("./faster_rcnn.h5", by_name=True)
     # backbone.trainable = False
-    neck = fpn.FPN(
-        name='fpn')
+
+    input_c2 = layers.Input((24, 24, 256))
+    input_c3 = layers.Input((12, 12, 512))
+    input_c4 = layers.Input((6, 6, 1024))
+    input_c5 = layers.Input((3, 3, 2048))
+
+    out_channels = 256
+        
+    fpn_c2p2 = layers.Conv2D(out_channels, (1, 1), 
+                                    kernel_initializer='he_normal', name='fpn_c2p2')
+    fpn_c3p3 = layers.Conv2D(out_channels, (1, 1), 
+                                    kernel_initializer='he_normal', name='fpn_c3p3')
+    fpn_c4p4 = layers.Conv2D(out_channels, (1, 1), 
+                                    kernel_initializer='he_normal', name='fpn_c4p4')
+    fpn_c5p5 = layers.Conv2D(out_channels, (1, 1), 
+                                    kernel_initializer='he_normal', name='fpn_c5p5')
+    
+    fpn_p3upsampled = layers.UpSampling2D(size=(2, 2), name='fpn_p3upsampled')
+    fpn_p4upsampled = layers.UpSampling2D(size=(2, 2), name='fpn_p4upsampled')
+    fpn_p5upsampled = layers.UpSampling2D(size=(2, 2), name='fpn_p5upsampled')
+    
+    
+    fpn_p2 = layers.Conv2D(out_channels, (3, 3), padding='SAME', 
+                                kernel_initializer='he_normal', name='fpn_p2')
+    fpn_p3 = layers.Conv2D(out_channels, (3, 3), padding='SAME', 
+                                kernel_initializer='he_normal', name='fpn_p3')
+    fpn_p4 = layers.Conv2D(out_channels, (3, 3), padding='SAME', 
+                                kernel_initializer='he_normal', name='fpn_p4')
+    fpn_p5 = layers.Conv2D(out_channels, (3, 3), padding='SAME', 
+                                kernel_initializer='he_normal', name='fpn_p5')
+    
+    fpn_p6 = layers.MaxPooling2D(pool_size=(1, 1), strides=2, name='fpn_p6')
+
+
+    P5 = fpn_c5p5(input_c5)
+    P4 = fpn_c4p4(input_c4) + fpn_p5upsampled(P5)
+    P3 = fpn_c3p3(input_c3) + fpn_p4upsampled(P4)
+    P2 = fpn_c2p2(input_c2) + fpn_p3upsampled(P3)
+    
+    # Attach 3x3 conv to all P layers to get the final feature maps.
+    P2 = fpn_p2(P2)
+    P3 = fpn_p3(P3)
+    P4 = fpn_p4(P4)
+    P5 = fpn_p5(P5)
+    P6 = fpn_p6(P5)
+    neck = tf.keras.Model(inputs=[input_c2, input_c3, input_c4, input_c5], outputs=[P2, P3, P4, P5, P6])
     if training:
         input_a = layers.Input(inp_shape, name="anchor")
         input_p = layers.Input(inp_shape, name="positive")
