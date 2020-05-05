@@ -10,7 +10,7 @@ def data_gen():
 
 model = get_siamese_model(training=False)
 # model = tf.keras.applications.ResNet50(include_top=False, input_shape=(96, 96, 3))
-model.load_weights("D:\\id-card-matching\\logs\\cropped_average_small\\siamese.h5", by_name=True)
+model.load_weights("../siamese.h5", by_name=True)
 
 converter = tf.lite.TFLiteConverter.from_keras_model(model)
 # converter.experimental_new_converter=False
