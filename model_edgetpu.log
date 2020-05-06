@@ -1,14 +1,3 @@
-Edge TPU Compiler version 2.1.302470888
-Input: model.tflite
-Output: model_edgetpu.tflite
-
-Operator                       Count      Status
-
-ADD                            17         Mapped to Edge TPU
-MAX_POOL_2D                    1          Mapped to Edge TPU
-PAD                            2          Mapped to Edge TPU
-MUL                            1          Mapped to Edge TPU
-QUANTIZE                       1          Operation is otherwise supported, but not mapped due to some unspecified limitation
-CONV_2D                        53         Mapped to Edge TPU
-DEQUANTIZE                     1          Operation is working on an unsupported data type
-FULLY_CONNECTED                1          Mapped to Edge TPU
+version https://git-lfs.github.com/spec/v1
+oid sha256:54ccaf8112d08c1c9b527b117b6087565e28111d3ba4c4efbe069d5bfc425cf2
+size 662
