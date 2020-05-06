@@ -8,7 +8,7 @@ from dl.face_crop import FaceCrop
 class Predictor:
     def __init__(self):
         self.threshold = 0.55
-        self.tflite_model = tflite.Interpreter("/home/pi/model_edgetpu.tflite", experimental_delegates=[tflite.load_delegate("libedgetpu.so.1")])
+        self.tflite_model = tflite.Interpreter("../model_edgetpu.tflite", experimental_delegates=[tflite.load_delegate("libedgetpu.so.1")])
         self.tflite_model.allocate_tensors()
         self.face_cropper = FaceCrop()
         self.input_details = self.tflite_model.get_input_details()
