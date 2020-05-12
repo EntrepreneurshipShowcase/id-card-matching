@@ -2,7 +2,7 @@ from aspen import aspen_pi
 import RPi.GPIO as GPIO
 import logging
 RED_LED_PIN = 26 
-GREEN_LED_PIN = 16 
+GREEN_LED_PIN = 20 
 ADD_BUTTON_PIN = 17 
 SERVO_PIN = 12
 VERIFY_BUTTON_PIN = 27 
