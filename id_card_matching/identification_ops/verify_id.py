@@ -23,4 +23,4 @@ def verify(predictor, camera, reader, detector, servo, card_vec=False, driver=No
     if card_vec and vec is not None:
         return predictor.is_same_person(vec, comp_vec)
     elif driver is not None:
-        return driver.verify(rfid_id, comp_vec)
+        return driver.verify_and_update(rfid_id, comp_vec)
