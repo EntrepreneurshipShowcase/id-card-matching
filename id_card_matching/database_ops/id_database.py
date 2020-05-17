@@ -73,7 +73,7 @@ class DataDriver:
         # Immediately get all ids
         self.database.identification_doc.on_snapshot(self.on_id_update)
         self.database.attendance_doc.on_snapshot(self.on_attendance_update)
-
+        
         self.threshold = self.predictor.threshold
 
     def on_id_update(self, doc_snapshot, changes, read_time):
@@ -82,7 +82,7 @@ class DataDriver:
 
     def on_attendance_update(self, doc_snapshot, changes, read_time):
         for doc in doc_snapshot:
-            self.id_vectors = doc.to_dict()
+            self.attendance = doc.to_dict()
 
     def lookup_person(self, vec):
         min_dis = float("inf")
