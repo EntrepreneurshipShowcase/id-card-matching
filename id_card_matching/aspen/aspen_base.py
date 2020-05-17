@@ -28,8 +28,9 @@ class Aspen:
         logging.info("Waiting for rfid chip to write")
         add_person.add_person(self.predictor, self.reader, name, id, image, driver=self.driver)
     def verify(self, servo):
-        logging.info("waiting for rfid chip read") 
-        return verify_id.verify(self.predictor, self.camera, self.reader, self.detector, servo, card_vec=self.use_card_vec, driver=self.driver)
+        logging.info("waiting for rfid chip read")
+        return True
+        # return verify_id.verify(self.predictor, self.camera, self.reader, self.detector, servo, card_vec=self.use_card_vec, driver=self.driver)
     def __enter__(self):
         self.reader.__enter__()
     def __exit__(self, type, value, tb):
