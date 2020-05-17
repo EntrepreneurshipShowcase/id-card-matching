@@ -9,12 +9,12 @@ def verify(predictor, camera, reader, detector, servo, card_vec=False, driver=No
 
     if len(detector(image)) == 0:
         servo.high()
-        time.sleep(2)
+        time.sleep(0.3)
         logging.info("Taking high photo")
         image = cam.take_picture(camera)
         if len(detector(image)) == 0:
             servo.low()
-            time.sleep(2)
+            time.sleep(0.3)
             logging.info("Taking low photo")
             image = cam.take_picture(camera)
     servo.mid()
