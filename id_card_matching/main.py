@@ -2,6 +2,13 @@ import sys
 sys.path.append("/home/pi/id-card-matching/id_card_matching/")
 import os
 os.chdir("/home/pi/id-card-matching/id_card_matching/")
+
+print("""
+********************************
+*****Starting AIM Processes*****
+********************************
+""")
+
 from aspen import aspen_pi
 import RPi.GPIO as GPIO
 import logging
