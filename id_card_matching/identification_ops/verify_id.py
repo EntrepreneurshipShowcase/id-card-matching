@@ -29,6 +29,7 @@ def verify_demo(reader, servo, driver=None):
     rfid_id, id, name, vec = reader.read()
     logging.info("Taking picture normal...")
     servo.high()
+    time.sleep(1.5)
     logging.info("Taking high photo")
     servo.mid()
     logging.info("Took pic")
