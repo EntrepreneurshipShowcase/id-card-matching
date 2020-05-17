@@ -97,7 +97,7 @@ class DataDriver:
         return matched_id
 
     def verify_and_update(self, rfid, vec, debug=False):
-        self.database.update_attendance(self.id_vectors[rfid]["id"], True)
+        self.database.update_attendance(self.id_vectors[str(rfid)]["id"], True)
         return self.predictor.is_same_face(
             vec, np.array(self.id_vectors[str(rfid)]["vector"]), debug=debug
         )
