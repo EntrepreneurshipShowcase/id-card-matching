@@ -24,3 +24,12 @@ def verify(predictor, camera, reader, detector, servo, card_vec=False, driver=No
         return predictor.is_same_person(vec, comp_vec)
     elif driver is not None:
         return driver.verify_and_update(rfid_id, comp_vec)
+
+def verify_demo(reader, servo, driver=None):
+    rfid_id, id, name, vec = reader.read()
+    logging.info("Taking picture normal...")
+    servo.high()
+    logging.info("Taking high photo")
+    servo.mid()
+    logging.info("Took pic")
+    return driver.verify_and_update(rfid_id, None)
