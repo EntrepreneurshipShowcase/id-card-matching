@@ -12,9 +12,9 @@ class RFID:
         pass
     def write(self, id, name, vec=None):
         if self.use_card_vec and vec is not None:
-            text = f"{id}/{name}/{np.array2string(vec)}"
+            text = "{}/{}/{}".format(id, name, np.array2string(vec))
         else:
-            text = f"{id}/{name}"
+            text = "{}/{}".format(id, name)
         start=time.time()
         rfid, _ = self.reader.write(text)
         end=time.time()
