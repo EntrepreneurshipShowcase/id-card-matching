@@ -16,6 +16,7 @@ class AspenPi(aspen.Aspen):
             logging.info("Ready")
             self.verify_button.add_function(self.verify_id)
             self.add_button.add_function(self.add_random_id)
+            self.verify_id()
             pause()
         except KeyboardInterrupt:
             return
@@ -30,7 +31,6 @@ class AspenPi(aspen.Aspen):
     def add_random_id(self):
         pic = camera.take_picture(self.camera)
         logging.info("Took pic")
-        
         inp_id = input("Enter id of the person")
         inp_name = input("Enter name of the person")
         super(AspenPi, self).add_person(inp_name, inp_id, pic)
