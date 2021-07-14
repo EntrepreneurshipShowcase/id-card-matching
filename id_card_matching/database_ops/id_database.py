@@ -29,7 +29,11 @@ class IDDatabase:
             .collection(u"attendance")
             .document(u"overall")
         )
-
+        self.attendance_collection = (
+            self.db.collection(u"base")
+            .document(u"dhs")
+            .collection(u"attendance")
+        )
     def add_person(self, name, id, vec, rfid=None):
         if rfid:
             id_num = rfid
@@ -44,6 +48,11 @@ class IDDatabase:
     def update_attendance(self, id, status):
         data = {str(id): {u"status": status}}
         self.attendance_doc.update(data)
+
+        # Adding query for different docs per student
+        student_docs = self.attendance_collection.where(u"id", u"==", str(id)).limit(1).stream()
+        for doc in student_docs:
+            self.attendance_collection.document(doc.id).update({"status": status})
 
     def get_ids(self):
         return self.identification_doc.get()
